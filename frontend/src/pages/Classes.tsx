@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { ArrowRight } from 'lucide-react'
 
 type ClassGroup = {
   department: string
@@ -35,6 +36,7 @@ export default function Classes() {
                   >
                     <span className="class-tile-dept">{group.department}</span>
                     <span className="class-tile-section">{section}</span>
+                    <ArrowRight className="class-tile-arrow" size={15} strokeWidth={2} />
                   </button>
                 )
               })}

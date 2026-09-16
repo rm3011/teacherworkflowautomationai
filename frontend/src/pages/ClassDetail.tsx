@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { ChangeEvent } from 'react'
 import { useParams } from 'react-router-dom'
+import { AlertTriangle, CalendarClock, Check, ClipboardList, FileImage, IdCard, Users } from 'lucide-react'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
@@ -211,15 +212,15 @@ export default function ClassDetail() {
       <h2>{classId}</h2>
       <p className="sub">{now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} · {currentPeriod ? `Current period: ${currentPeriod.course_code} (${formatTime(currentPeriod.start_time)}–${formatTime(currentPeriod.end_time)})` : 'No active period right now'}</p>
 
-      {currentPeriod && <div className="current-period"><span>NOW</span><strong>{currentPeriod.course_code}</strong><small>{currentPeriod.course_name} · {currentPeriod.staff_name}</small></div>}
+      {currentPeriod && <div className="current-period"><span><CalendarClock size={15} /></span><strong>{currentPeriod.course_code}</strong><small>{currentPeriod.course_name} · {currentPeriod.staff_name}</small></div>}
 
       <div className="upload-grid">
         <label className={`upload-card ${uploading === 'timetable' ? 'is-uploading' : ''}`}>
-          <span className="upload-icon">TT</span><span className="upload-card-title">Upload timetable</span><span className="upload-card-copy">AI extracts and saves this section's schedule.</span>
+          <span className="upload-icon"><FileImage size={21} /></span><span className="upload-card-title">Upload timetable</span><span className="upload-card-copy">AI extracts and saves this section's schedule.</span>
           <input type="file" accept="image/*" onChange={(event) => void uploadFile('timetable', event)} disabled={uploading !== null} />
         </label>
         <label className={`upload-card attendance ${uploading === 'attendance' ? 'is-uploading' : ''}`}>
-          <span className="upload-icon">LOG</span><span className="upload-card-title">Upload attendance logs</span><span className="upload-card-copy">Select one or many images for this period.</span>
+          <span className="upload-icon"><ClipboardList size={21} /></span><span className="upload-card-title">Upload attendance logs</span><span className="upload-card-copy">Select one or many images for this period.</span>
           <input type="file" accept="image/*" multiple onChange={(event) => void uploadFile('attendance', event)} disabled={uploading !== null} />
         </label>
       </div>
@@ -239,11 +240,11 @@ export default function ClassDetail() {
       </section>
 
       <section className="analytics-section">
-        <div className="section-heading"><div><h3>Attendance watch</h3><p className="sub">Scores fall with absences. Red means 3+ absences or below 75%.</p></div></div>
+        <div className="section-heading"><div><h3><AlertTriangle size={17} /> Attendance watch</h3><p className="sub">Scores fall with absences. Red means 3+ absences or below 75%.</p></div></div>
         {students.length === 0 ? <p className="empty-state">No attendance data to score yet.</p> : <div className="analytics-grid">{students.map((student) => <div className={`student-score-card ${student.red_flag ? 'red-flag' : ''}`} key={student.rrn}><div className="student-score-head"><div><strong>{student.name || 'Unnamed student'}</strong><small>{student.rrn}</small></div><b>{student.score}%</b></div><div className="score-track"><span style={{ width: `${student.score}%` }} /></div><p>{student.present} present · {student.absent} absent{student.anomalies > 0 ? ` · ${student.anomalies} bunking alert${student.anomalies === 1 ? '' : 's'}` : ''}</p></div>)}</div>}
       </section>
 
-      <button className="student-history-card" onClick={() => setShowStudents((visible) => !visible)}><span className="upload-icon">ID</span><span><strong>Students and attendance history</strong><small>{students.length} students tracked from the beginning</small></span><b>{showStudents ? '−' : '+'}</b></button>
+      <button className="student-history-card" onClick={() => setShowStudents((visible) => !visible)}><span className="upload-icon"><Users size={20} /></span><span><strong>Students and attendance history</strong><small>{students.length} students tracked from the beginning</small></span><b>{showStudents ? <Check size={18} /> : <IdCard size={18} />}</b></button>
       {showStudents && <section className="card student-history"><h3>Student history</h3>{students.length === 0 ? <p className="empty-state">No saved attendance records yet.</p> : <div className="attendance-table-wrap"><table className="attendance-table"><thead><tr><th>RRN</th><th>Name</th><th>Attendance history</th></tr></thead><tbody>{students.map((student) => <tr key={student.rrn}><td>{student.rrn}</td><td>{student.name ?? '—'}</td><td>{attendanceLogs.map((log) => { const record = log.records.find((item) => item.rrn === student.rrn); return record ? <span className={`history-mark ${record.status}`} key={`${log.date}-${log.period_start}`}>{log.date} {log.period_start?.slice(0, 5)} {record.status === 'present' ? 'P' : 'A'}</span> : null })}</td></tr>)}</tbody></table></div>}</section>}
     </div>
   )
