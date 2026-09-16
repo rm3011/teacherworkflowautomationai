@@ -13,12 +13,14 @@ def _get_client() -> genai.Client:
     return _client
 
 
-def extract_timetable(image_bytes: bytes) -> TimetableExtraction:
+def extract_timetable(
+    image_bytes: bytes, mime_type: str = "image/jpeg"
+) -> TimetableExtraction:
     client = _get_client()
     response = client.models.generate_content(
         model="gemini-3.6-flash",
         contents=[
-            types.Part.from_bytes(data=image_bytes, mime_type="image/jpeg"),
+            types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
             "Extract every timetable entry from this image. Return all rows.",
         ],
         config=types.GenerateContentConfig(
@@ -29,12 +31,14 @@ def extract_timetable(image_bytes: bytes) -> TimetableExtraction:
     return response.parsed
 
 
-def extract_attendance(image_bytes: bytes) -> AttendanceExtraction:
+def extract_attendance(
+    image_bytes: bytes, mime_type: str = "image/jpeg"
+) -> AttendanceExtraction:
     client = _get_client()
     response = client.models.generate_content(
         model="gemini-3.6-flash",
         contents=[
-            types.Part.from_bytes(data=image_bytes, mime_type="image/jpeg"),
+            types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
             "Extract every student attendance row. RRN is the roll number. "
             "Status is either 'present' or 'absent'.",
         ],

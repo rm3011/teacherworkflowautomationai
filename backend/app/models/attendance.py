@@ -11,6 +11,8 @@ class AttendanceLog(Base):
     class_id: Mapped[str] = mapped_column(String(20), index=True)
     date: Mapped[date_type] = mapped_column()
     course_code: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    period_start: Mapped[str | None] = mapped_column(String(8), nullable=True)
+    period_end: Mapped[str | None] = mapped_column(String(8), nullable=True)
     image_url: Mapped[str] = mapped_column(String(500))
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
