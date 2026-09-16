@@ -1,4 +1,3 @@
-from datetime import date
 from sqlalchemy.orm import Session
 from app.models import AttendanceLog, AttendanceRecord
 from app.schemas.attendance import AttendanceSaveRequest
@@ -40,6 +39,7 @@ def get_attendance_analytics(db: Session, class_id: str) -> list[dict]:
 
     for student in student_rows.values():
         history = student["history"]
+        history.sort(key=lambda item: (item["date"], item["period_start"] or ""))
         for previous, current in zip(history, history[1:]):
             if (
                 previous["date"] == current["date"]
@@ -50,7 +50,6 @@ def get_attendance_analytics(db: Session, class_id: str) -> list[dict]:
         total = student["present"] + student["absent"]
         student["score"] = round((student["present"] / total) * 100) if total else 100
         student["red_flag"] = student["absent"] >= 3 or student["score"] < 75
-        student["history"].sort(key=lambda item: (item["date"], item["period_start"] or ""))
     return sorted(student_rows.values(), key=lambda student: student["rrn"])
 
 
@@ -60,8 +59,8 @@ def save_attendance(
 ) -> AttendanceLog:
     log = AttendanceLog(
         class_id=request.class_id,
-        date=date.today(),
-        image_url=image_url,
+        date=request.date,
+        image_url="pending_upload",
         course_code=request.course_code,
         period_start=request.period_start,
         period_end=request.period_end,
